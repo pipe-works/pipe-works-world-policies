@@ -1,0 +1,14 @@
+{
+  "artifact_file": "publish_2741a7bbdc725040ad3a1ab91b997d8b31c4dbbd69ce4f89e069f270f6331bc8.json",
+  "artifact_hash": "f102ae6efb9807aa75cea71699ff559dcdd882ed810b4d9e75e6b6a649b935ae",
+  "artifact_path": "/Users/aapark/pipe-works-development/pipe-works-world-policies/worlds/daily_undertaking/world/publish_2741a7bbdc725040ad3a1ab91b997d8b31c4dbbd69ce4f89e069f270f6331bc8.json",
+  "client_profile": null,
+  "item_count": 30,
+  "items_hash": "a913780e17727923320ea0e78bc4a17e06cad884bd9663af5800a81383b6bf63",
+  "manifest_hash": "2741a7bbdc725040ad3a1ab91b997d8b31c4dbbd69ce4f89e069f270f6331bc8",
+  "mirror_mode": "non_authoritative",
+  "policy_authority": "mud_server",
+  "scope": "world",
+  "variants_hash": "58517144627d3440f27a54e4e8826b0311dba6edc94ccd2b12dd171176849f66",
+  "world_id": "daily_undertaking"
+}
