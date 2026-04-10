@@ -24,7 +24,7 @@ the workspace `pipe-works-world-policies`.
 
 The current codebase is best understood as:
 
-- a mirror and exchange repository for canonical published policy artifacts
+- an exchange repository for canonical published policy artifacts
 - a very small Python helper package under `src/pipeworks_world_policies/`
 - a repo whose most important contract is filesystem layout and artifact
   coherence, not a long-running application process
@@ -217,7 +217,7 @@ Repo-specific guidance:
   redefines the exchange format
 - when changing artifact structure, cross-check impact on
   `pipeworks_mud_server` bootstrap and import flows before merging
-- when in doubt, treat mirror artifact compatibility as more important than
+- when in doubt, treat artifact compatibility as more important than
   adding convenience code
 
 ## Testing Guidelines
@@ -253,5 +253,5 @@ When touching CI, release, or packaging behavior:
 
 - preserve release-please inputs and package identity
 - do not casually rename the repo/package/workspace surfaces
-- keep the repo usable as a deterministic artifact mirror, not just a Python
-  helper package
+- keep the repo usable as a deterministic artifact exchange repo, not just a
+  Python helper package
