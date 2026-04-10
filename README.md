@@ -24,6 +24,12 @@ pyenv exec pip install -e ".[dev]"
 pyenv exec pre-commit install
 ```
 
+If docs tooling is needed:
+
+```bash
+pyenv exec pip install -e ".[dev,docs]"
+```
+
 Create local-only working notes area and shared symlink:
 
 ```bash
@@ -45,6 +51,7 @@ pyenv exec ruff check src tests
 pyenv exec black --check src tests
 pyenv exec mypy src
 PYTHONPATH=src pyenv exec pytest -q
+pyenv exec python -m build --no-isolation
 ```
 
 ## CI/CD

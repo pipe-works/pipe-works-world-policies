@@ -130,6 +130,18 @@ For this repository, that currently means:
 At the moment, this repo is better understood as a host-visible artifact source
 than as a service rollout target.
 
+Current Luminal interpreter position for this repo:
+
+- the dedicated Luminal venv for this repo is
+  `/srv/work/pipeworks/venvs/pw-world-policies`
+- the current PipeWorks Luminal default interpreter baseline is Python `3.13`
+- this repo should follow that Python `3.13` baseline on Luminal unless an
+  explicit dependency-driven exception is documented later
+- the current known PipeWorks exception is
+  `/srv/work/_working/pipeworks-org-review/pipeworks-image-generator`, which is
+  expected to stay on Python `3.12` because Linux GPU/ML compatibility for
+  CUDA, PyTorch, and NVIDIA-adjacent packages is more predictable there
+
 ## Local Setup And Commands
 
 The current repo README documents local developer setup via `pyenv`:
@@ -141,6 +153,12 @@ pyenv exec pre-commit install
 ./tools/bootstrap_local_workspace.sh
 ```
 
+If docs tooling is needed:
+
+```bash
+pyenv exec pip install -e '.[dev,docs]'
+```
+
 Quality gates from the current repo state:
 
 ```bash
@@ -148,6 +166,7 @@ pyenv exec ruff check src tests
 pyenv exec black --check src tests
 pyenv exec mypy src
 PYTHONPATH=src pyenv exec pytest -q
+pyenv exec python -m build --no-isolation
 ```
 
 If you are doing Luminal-specific preparation work, do not assume that `pyenv`
@@ -176,7 +195,9 @@ operator workflow rather than a broad Python application surface.
 Follow the tool configuration in `pyproject.toml`:
 
 - Black line length is `100`
-- Ruff targets Python `3.12`
+- Ruff currently targets Python `3.12` syntax compatibility in repo config,
+  while the standard Luminal host venv baseline for PipeWorks repos is Python
+  `3.13`
 - Mypy is enabled for `src`
 - pytest configuration lives in `pyproject.toml`
 
