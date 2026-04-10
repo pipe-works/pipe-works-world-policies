@@ -103,12 +103,20 @@ The current `pipeworks_mud_server` bootstrap code resolves artifacts from
 `latest.json` by trying:
 
 - the absolute `artifact_path` if present
+- the export-root-relative `artifact_path` if present and relative
 - the sibling file with the same basename next to `latest.json`
 - the sibling `artifact_file`
 
-Because of that fallback behavior, a checked-in absolute path from another
-machine does not automatically break Luminal bootstrap as long as the sibling
-artifact file exists and `artifact_file` is correct.
+The intended checked-in contract is now:
+
+- `artifact_file` names the sibling artifact file
+- `artifact_path` is repo-relative, for example
+  `worlds/<world_id>/<scope>/publish_<manifest_hash>.json`
+
+Because of the fallback behavior, a stale absolute path from another machine
+does not automatically break bootstrap as long as the sibling artifact file
+exists and `artifact_file` is correct, but new checked-in pointers should not
+use machine-specific absolute paths.
 
 ## Luminal Host Posture
 
