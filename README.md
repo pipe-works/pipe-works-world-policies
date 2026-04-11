@@ -1,72 +1,127 @@
+[![CI](https://github.com/pipe-works/pipe-works-world-policies/actions/workflows/ci.yml/badge.svg)](https://github.com/pipe-works/pipe-works-world-policies/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/pipe-works/pipe-works-world-policies/branch/main/graph/badge.svg)](https://codecov.io/gh/pipe-works/pipe-works-world-policies) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
 # pipe-works-world-policies
 
-Exchange repository for mud-server world policy publish/import artifacts.
+`pipe-works-world-policies` is the exchange repository for published world
+policy artifacts used by PipeWorks runtime services. It stores reviewable,
+versioned export outputs while leaving canonical runtime activation state in
+`pipeworks_mud_server`.
 
-## Purpose
+## PipeWorks Workspace
 
-- Keep canonical runtime authority in mud-server SQLite DB.
-- Store exported policy artifacts for review and sharing.
-- Provide a stable world/scoped artifact layout.
+These repositories are designed to live inside a shared PipeWorks workspace
+rooted at `/srv/work/pipeworks`.
+
+- `repos/` contains source checkouts only.
+- `venvs/` contains per-project virtual environments such as `pw-mud-server`.
+- `runtime/` contains mutable runtime state such as databases, exports, session
+  files, and caches.
+- `logs/` contains service-owned log output when a project writes logs outside
+  the process manager.
+- `config/` contains workspace-level configuration files that should not be
+  treated as source.
+- `bin/` contains optional workspace helper scripts.
+- `home/` is reserved for workspace-local user data when a project needs it.
+
+Across the PipeWorks ecosphere, the rule is simple: keep source in `repos/`,
+keep mutable state outside the repo checkout, and use explicit paths between
+repos when one project depends on another.
+
+## What This Repo Owns
+
+This repository is the source of truth for:
+
+- published world-policy exchange artifacts under `worlds/`
+- the stable artifact layout consumed by bootstrap/import flows
+- lightweight helper code for validating repository structure
+- local tooling such as `_working` bootstrap support
+
+This repository does not own:
+
+- canonical runtime policy activation state
+- mud-server policy CRUD APIs
+- in-repo authoring UIs or web services
 
 ## Repository Layout
 
-- `worlds/<world_id>/<scope>/publish_<manifest_hash>.json`
-- `worlds/<world_id>/<scope>/latest.json`
-- `src/pipeworks_world_policies/` minimal helper package for validation utilities
-- `tests/` unit tests for repository helpers
-- `tools/bootstrap_local_workspace.sh` local `_working` scaffold + symlink setup
+- `worlds/<world_id>/<scope>/publish_<manifest_hash>.json` versioned published
+  artifacts
+- `worlds/<world_id>/<scope>/latest.json` stable pointer to the active published
+  artifact for that scope
+- `src/pipeworks_world_policies/` minimal helper package
+- `tests/` repository helper tests
+- `tools/bootstrap_local_workspace.sh` local `_working` bootstrap helper
 
-## Local Setup
+## Role In The Ecosystem
+
+The intended flow is:
+
+1. policy objects are authored and managed through canonical mud-server APIs
+2. publish/export flows produce artifact files into this repo
+3. runtime bootstrap or explicit import flows read those files back into
+   `pipeworks_mud_server`
+
+This keeps artifact exchange reviewable without pretending the artifact repo is
+the runtime authority.
+
+## Quick Start
+
+Create a dedicated workspace venv and install the helper package:
 
 ```bash
-pyenv local pms
-pyenv exec pip install -e ".[dev]"
-pyenv exec pre-commit install
+python3 -m venv /srv/work/pipeworks/venvs/pw-world-policies
+/srv/work/pipeworks/venvs/pw-world-policies/bin/pip install -e ".[dev]"
 ```
 
-If docs tooling is needed:
+If you need the docs toolchain too:
 
 ```bash
-pyenv exec pip install -e ".[dev,docs]"
+/srv/work/pipeworks/venvs/pw-world-policies/bin/pip install -e ".[dev,docs]"
 ```
 
-Create local-only working notes area and shared symlink:
+Bootstrap the local `_working` area:
 
 ```bash
 ./tools/bootstrap_local_workspace.sh
 ```
 
-Optional custom shared notes path:
+Or point it at an explicit shared-notes location:
 
 ```bash
-WORKING_SHARED_PATH=/absolute/path/to/_working_shared ./tools/bootstrap_local_workspace.sh
+WORKING_SHARED_PATH=/srv/work/pipeworks/home/_working_shared \
+./tools/bootstrap_local_workspace.sh
 ```
 
-`_working/` is intentionally ignored by git.
+## Using The Repo With mud-server
 
-## Quality Gates
+Workspace-backed mud-server runs should point `MUD_POLICY_EXPORTS_ROOT` at this
+repo:
 
 ```bash
-pyenv exec ruff check src tests
-pyenv exec black --check src tests
-pyenv exec mypy src
-PYTHONPATH=src pyenv exec pytest -q
-pyenv exec python -m build --no-isolation
+export MUD_POLICY_EXPORTS_ROOT=/srv/work/pipeworks/repos/pipe-works-world-policies
 ```
 
-## CI/CD
+That allows `mud-server init-db` and explicit
+`mud-server import-policy-artifact --artifact-path ...` flows to resolve
+published artifacts without depending on an implicit current working directory.
 
-This repo is wired to organization reusable workflows:
+## Validation
 
-- `.github/workflows/ci.yml`
-- `.github/workflows/release-please.yml`
-- `.github/workflows/dependency-update.yml`
+Run the main checks from the repo root:
 
-Release automation files:
+```bash
+/srv/work/pipeworks/venvs/pw-world-policies/bin/ruff check src tests
+/srv/work/pipeworks/venvs/pw-world-policies/bin/black --check src tests
+/srv/work/pipeworks/venvs/pw-world-policies/bin/mypy src
+PYTHONPATH=src /srv/work/pipeworks/venvs/pw-world-policies/bin/pytest -q
+/srv/work/pipeworks/venvs/pw-world-policies/bin/python -m build --no-isolation
+```
 
-- `release-please-config.json`
-- `.release-please-manifest.json`
+## Documentation
+
+The repo is intentionally lightweight. Most detailed policy behavior is
+documented in the runtime and authoring repos that consume these artifacts.
 
 ## License
 
-GPL-3.0-or-later (see `LICENSE`).
+[GPL-3.0-or-later](LICENSE)
